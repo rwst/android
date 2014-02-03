@@ -27,13 +27,13 @@ import android.util.Log;
  * 
  * @author Rasmi.Elasmar
  * @author Ralf.Stephan
- *
+ * 
  */
 public class CellData {
 	private static final String TAG = "CellData";
 	private static final String JSON_UUID = "uuid";
 	private static final String JSON_GROUP = "group";
-	private static final String JSON_TITLE= "title";
+	private static final String JSON_TITLE = "title";
 	private static final String JSON_DESCRIPTION = "description";
 	private static final String JSON_INPUT = "input";
 	private static final String JSON_RANK = "rank";
@@ -57,11 +57,12 @@ public class CellData {
 	}
 
 	public CellData(CellData originalCell) {
-		uuid = UUID.randomUUID(); 
+		uuid = UUID.randomUUID();
 		group = originalCell.group;
 		title = originalCell.title;
 		Date date = new Date();
-		DateFormat dateFormat = new SimpleDateFormat("EEE, MMM d, yyyy hh:mm aaa",Locale.US);
+		DateFormat dateFormat = new SimpleDateFormat(
+				"EEE, MMM d, yyyy hh:mm aaa", Locale.US);
 		description = dateFormat.format(date);
 		input = originalCell.input;
 		rank = originalCell.rank;
@@ -73,7 +74,7 @@ public class CellData {
 	}
 
 	public CellData(JSONObject json) throws JSONException {
-		
+
 		uuid = UUID.fromString(json.getString(JSON_UUID));
 		group = json.getString(JSON_GROUP);
 		title = json.getString(JSON_TITLE);
@@ -82,7 +83,7 @@ public class CellData {
 		rank = json.getInt(JSON_RANK);
 		favorite = json.getBoolean(JSON_FAVORITE);
 		htmlData = json.getString(JSON_HTML);
-		
+
 		if (description == null) {
 			Log.e(TAG, "Null description in CellData. Fixed.");
 			description = "";
@@ -133,12 +134,13 @@ public class CellData {
 	public File cacheDir() {
 		if (cache != null)
 			return cache;
-		File base = CellCollection.getInstance().getCacheDirBase(); 
+		File base = CellCollection.getInstance().getCacheDirBase();
 		cache = new File(base, uuid.toString());
 		if (!cache.exists()) {
 			boolean rc = cache.mkdir();
 			if (!rc)
-				Log.e(TAG, "Unable to create directory "+cache.getAbsolutePath());
+				Log.e(TAG,
+						"Unable to create directory " + cache.getAbsolutePath());
 		}
 		return cache;
 	}
@@ -151,7 +153,9 @@ public class CellData {
 	public void saveOutput(String output_block, String html) {
 		addOutputBlock(output_block);
 		htmlData += html;
-		Log.i(TAG, "CellData added output_block to " + title + " " + uuid.toString() + ": "+ html);
+		Log.i(TAG,
+				"CellData added output_block to " + title + " "
+						+ uuid.toString() + ": " + html);
 		File f = cacheDirIndexFile(output_block);
 		Log.i(TAG, "Saving html: " + output_block + " " + html);
 		FileOutputStream os;
@@ -189,12 +193,12 @@ public class CellData {
 		File[] files = cacheDir().listFiles();
 		for (File file : files)
 			if (!file.delete())
-				Log.e(TAG, "Error deleting "+file);
+				Log.e(TAG, "Error deleting " + file);
 	}
 
 	private void addOutputBlock(String block) {
-		//Log.i(TAG, "addOutputBlock: " + block);
-		if (outputBlocks == null) 
+		// Log.i(TAG, "addOutputBlock: " + block);
+		if (outputBlocks == null)
 			outputBlocks = new LinkedList<String>();
 		if (!outputBlocks.contains(block)) {
 			outputBlocks.add(block);
@@ -207,8 +211,10 @@ public class CellData {
 		try {
 			saveOutputBlocks(file);
 		} catch (IOException e) {
-			Log.e(TAG, "Unable to save output_block list: "+e.getLocalizedMessage());
-		} 
+			Log.e(TAG,
+					"Unable to save output_block list: "
+							+ e.getLocalizedMessage());
+		}
 	}
 
 	private void saveOutputBlocks(File file) throws IOException {
@@ -229,7 +235,7 @@ public class CellData {
 		BufferedInputStream bis = new BufferedInputStream(fis);
 		DataInputStream dis = new DataInputStream(bis);
 		int n = dis.readInt();
-		for (int i=0; i<n; i++) {
+		for (int i = 0; i < n; i++) {
 			String block = dis.readUTF();
 		}
 		// Log.e(TAG, "read "+n+" output_block fields");
@@ -242,11 +248,14 @@ public class CellData {
 			return outputBlocks;
 		outputBlocks = new LinkedList<String>();
 		File file = new File(cacheDir(), "output_blocks");
-		if (!file.exists()) return outputBlocks;
+		if (!file.exists())
+			return outputBlocks;
 		try {
 			outputBlocks.addAll(loadOutputBlocks(file));
 		} catch (IOException e) {
-			Log.e(TAG, "Unable to load output_block list: "+e.getLocalizedMessage());
+			Log.e(TAG,
+					"Unable to load output_block list: "
+							+ e.getLocalizedMessage());
 		}
 		return outputBlocks;
 	}
@@ -256,7 +265,7 @@ public class CellData {
 		JSONObject json = new JSONObject();
 		json.put(JSON_UUID, uuid.toString());
 		json.put(JSON_GROUP, group);
-		json.put(JSON_TITLE,  title);
+		json.put(JSON_TITLE, title);
 		json.put(JSON_DESCRIPTION, description);
 		json.put(JSON_INPUT, input);
 		json.put(JSON_RANK, rank);

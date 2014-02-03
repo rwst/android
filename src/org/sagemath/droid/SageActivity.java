@@ -34,19 +34,14 @@ import com.example.android.actionbarcompat.ActionBarActivity;
 /**
  * SageActivity - handling of single cell display and input
  * 
- * @author vbraun
+ * @author Volker.Braun
  * @author Rasmi.Elasmar
  * @author Ralf.Stephan
- *
+ * 
  */
-public class SageActivity 
-extends 
-ActionBarActivity 
-implements
-Button.OnClickListener,
-OutputView.onSageListener,
-OnItemSelectedListener
-{
+public class SageActivity extends ActionBarActivity implements
+		Button.OnClickListener, OutputView.onSageListener,
+		OnItemSelectedListener {
 	private static final String TAG = "SageActivity";
 	private static final String DIALOG_NEW_CELL = "newCell";
 	private static final String DIALOG_DISCARD_CELL = "discardCell";
@@ -69,7 +64,7 @@ OnItemSelectedListener
 
 		CellCollection.initialize(getApplicationContext());
 		cell = CellCollection.getInstance().getCurrentCell();
-		Assert.assertNotNull(cell);	
+		Assert.assertNotNull(cell);
 
 		setContentView(R.layout.main);
 
@@ -78,9 +73,9 @@ OnItemSelectedListener
 			changeLog.getLogDialog().show();
 
 		input = (EditText) findViewById(R.id.sage_input);
-		roundBracket  = (Button) findViewById(R.id.bracket_round);
+		roundBracket = (Button) findViewById(R.id.bracket_round);
 		squareBracket = (Button) findViewById(R.id.bracket_square);
-		curlyBracket  = (Button) findViewById(R.id.bracket_curly);        
+		curlyBracket = (Button) findViewById(R.id.bracket_curly);
 		runButton = (ImageButton) findViewById(R.id.button_run);
 		outputView = (OutputView) findViewById(R.id.sage_output);
 		insertSpinner = (Spinner) findViewById(R.id.insert_text);
@@ -97,7 +92,8 @@ OnItemSelectedListener
 			Log.i(TAG, "Cell title is: " + cell.title);
 			Log.i(TAG, "Cell uuid is: " + cell.uuid.toString());
 			Log.i(TAG, "Starting new SageActivity with HTML: " + cell.htmlData);
-		} catch (Exception e) {}
+		} catch (Exception e) {
+		}
 
 		if (cell.group.equals("History")) {
 			outputView.setOutputBlocks(cell.htmlData);
@@ -107,24 +103,23 @@ OnItemSelectedListener
 			try {
 				outputView.clear();
 			} catch (Exception e) {
-				Log.e(TAG, "Error clearing output view." + e.getLocalizedMessage());
+				Log.e(TAG,
+						"Error clearing output view." + e.getLocalizedMessage());
 			}
 		}
-
 
 		server.setDownloadDataFiles(false);
 		setTitle(cell.getGroup() + " • " + cell.getTitle());
 		if (server.isRunning())
-			getActionBarHelper().setRefreshActionItemState(true);    
+			getActionBarHelper().setRefreshActionItemState(true);
 
 		input.setText(cell.getInput());
 		Boolean isNewCell = getIntent().getBooleanExtra("NEWCELL", false);
-		if (isNewCell){
+		if (isNewCell) {
 			runButton();
 		}
 
 	}
-
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -192,9 +187,14 @@ OnItemSelectedListener
 				share.putExtra(Intent.EXTRA_TEXT, shareURL);
 				startActivity(share);
 			} catch (Exception e) {
-				Log.e(TAG, "Couldn't share for some reason... " + e.getLocalizedMessage());
+				Log.e(TAG,
+						"Couldn't share for some reason... "
+								+ e.getLocalizedMessage());
 				runButton();
-				Toast.makeText(this, "You must run the calculation first! Try sharing again.", Toast.LENGTH_SHORT).show();
+				Toast.makeText(
+						this,
+						"You must run the calculation first! Try sharing again.",
+						Toast.LENGTH_SHORT).show();
 			}
 			return true;
 		case R.id.menu_changelog:
@@ -202,18 +202,18 @@ OnItemSelectedListener
 			return true;
 		case R.id.menu_about_sage:
 			uri = Uri.parse("http://www.sagemath.org");
-			intent = new Intent(Intent.ACTION_VIEW, uri); 
-			startActivity(intent); 
+			intent = new Intent(Intent.ACTION_VIEW, uri);
+			startActivity(intent);
 			return true;
 		case R.id.menu_manual_user:
 			uri = Uri.parse("http://www.sagemath.org/doc/tutorial/");
-			intent = new Intent(Intent.ACTION_VIEW, uri); 
-			startActivity(intent); 
+			intent = new Intent(Intent.ACTION_VIEW, uri);
+			startActivity(intent);
 			return true;
 		case R.id.menu_manual_dev:
 			uri = Uri.parse("http://www.sagemath.org/doc/reference/");
-			intent = new Intent(Intent.ACTION_VIEW, uri); 
-			startActivity(intent); 
+			intent = new Intent(Intent.ACTION_VIEW, uri);
+			startActivity(intent);
 			return true;
 		case R.id.menu_clean_history:
 			CellCollection.getInstance().cleanHistory();
@@ -244,9 +244,8 @@ OnItemSelectedListener
 		}
 	}
 
-
 	private void runButton() {
-		InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+		InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 		imm.hideSoftInputFromWindow(input.getWindowToken(), 0);
 		server.interrupt();
 		try {
@@ -254,7 +253,7 @@ OnItemSelectedListener
 				outputView.clear();
 				Log.i(TAG, "Called outputView.clear()!");
 			}
-		} catch (Exception e){
+		} catch (Exception e) {
 			Log.e(TAG, "Error clearing output...");
 		}
 
@@ -266,15 +265,15 @@ OnItemSelectedListener
 		CellCollection.getInstance().saveCells();
 		saveCurrentToHistory();
 	}
-	
-	private void saveCurrentToHistory()  {
+
+	private void saveCurrentToHistory() {
 		if (!cell.getGroup().equals("History")) {
 			CellData HistoryCell = new CellData(cell);
 			HistoryCell.group = "History";
 			HistoryCell.input = input.getText().toString();
 			String shortenedInput = HistoryCell.input;
 			if (HistoryCell.input.length() > 16)
-				shortenedInput = shortenedInput.substring(0,16);
+				shortenedInput = shortenedInput.substring(0, 16);
 			HistoryCell.title = shortenedInput;
 			CellCollection.getInstance().addCell(HistoryCell);
 		}
@@ -285,9 +284,9 @@ OnItemSelectedListener
 		getActionBarHelper().setRefreshActionItemState(false);
 	}
 
-
 	@Override
-	public void onSageInteractListener(Interact interact, String name, Object value) {
+	public void onSageInteractListener(Interact interact, String name,
+			Object value) {
 		Log.i(TAG, "onSageInteractListener: " + name + " = " + value);
 
 		server.interact(interact, name, value);
@@ -314,13 +313,14 @@ OnItemSelectedListener
 
 	protected static final int INSERT_PROMPT = 0;
 	protected static final int INSERT_FOR_LOOP = 1;
-	protected static final int INSERT_LIST_COMPREHENSION = 2; 
+	protected static final int INSERT_LIST_COMPREHENSION = 2;
 
 	@Override
-	public void onItemSelected(AdapterView<?> parent, View view, int position, long arg3) {
-		if (parent != insertSpinner) 
-			return;		
-		int cursor = input.getSelectionStart();	
+	public void onItemSelected(AdapterView<?> parent, View view, int position,
+			long arg3) {
+		if (parent != insertSpinner)
+			return;
+		int cursor = input.getSelectionStart();
 		switch (position) {
 		case INSERT_FOR_LOOP:
 			input.getText().append("\nfor i in range(0,10):\n     ");
@@ -328,7 +328,7 @@ OnItemSelectedListener
 			break;
 		case INSERT_LIST_COMPREHENSION:
 			input.getText().insert(cursor, "[ i for i in range(0,10) ]");
-			input.setSelection(cursor+2, cursor+3);
+			input.setSelection(cursor + 2, cursor + 3);
 			break;
 		}
 		parent.setSelection(0);

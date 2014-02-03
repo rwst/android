@@ -21,16 +21,15 @@ import com.example.android.actionbarcompat.ActionBarActivity;
  * 
  * @author Rasmi.Elasmar
  * @author Ralf.Stephan
- *
+ * 
  */
-public class CellActivity
-		extends ActionBarActivity 
-		implements OnGroupSelectedListener{
+public class CellActivity extends ActionBarActivity implements
+		OnGroupSelectedListener {
 	private final static String TAG = "CellActivity";
 	private static final String DIALOG_NEW_CELL = "newCell";
 
 	private ChangeLog changeLog;
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -41,38 +40,39 @@ public class CellActivity
 		} catch (Exception e) {
 			Log.e(TAG, "Error showing EULA: " + e.toString());
 			e.printStackTrace();
-			//this.finish();
+			// this.finish();
 		}
-		
+
 		changeLog = new ChangeLog(this);
-        if (changeLog.firstRun())
-            changeLog.getLogDialog().show();
-		
-		CellGroupsFragment groupsFragment = (CellGroupsFragment) 
-				getSupportFragmentManager().findFragmentById(R.id.cell_groups_fragment);
+		if (changeLog.firstRun())
+			changeLog.getLogDialog().show();
+
+		CellGroupsFragment groupsFragment = (CellGroupsFragment) getSupportFragmentManager()
+				.findFragmentById(R.id.cell_groups_fragment);
 		groupsFragment.setOnGroupSelected(this);
-		
-		CellListFragment listFragment = (CellListFragment)
-				getSupportFragmentManager().findFragmentById(R.id.cell_list_fragment);
-		if (listFragment != null && listFragment.isInLayout()) 
+
+		CellListFragment listFragment = (CellListFragment) getSupportFragmentManager()
+				.findFragmentById(R.id.cell_list_fragment);
+		if (listFragment != null && listFragment.isInLayout())
 			listFragment.switchToGroup(null);
 	}
-	
+
 	public static final String INTENT_SWITCH_GROUP = "intent_switch_group";
-	
+
 	@Override
 	public void onGroupSelected(String group) {
-		CellListFragment listFragment = (CellListFragment)
-				getSupportFragmentManager().findFragmentById(R.id.cell_list_fragment);
+		CellListFragment listFragment = (CellListFragment) getSupportFragmentManager()
+				.findFragmentById(R.id.cell_list_fragment);
 		if (listFragment == null || !listFragment.isInLayout()) {
-			Intent i = new Intent(getApplicationContext(), CellListActivity.class);
+			Intent i = new Intent(getApplicationContext(),
+					CellListActivity.class);
 			i.putExtra(INTENT_SWITCH_GROUP, group);
 			startActivity(i);
 		} else {
 			listFragment.switchToGroup(group);
 		}
 	}
-	
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater menuInflater = getMenuInflater();
@@ -102,18 +102,18 @@ public class CellActivity
 			return true;
 		case R.id.menu_about_sage:
 			uri = Uri.parse("http://www.sagemath.org");
-			intent = new Intent(Intent.ACTION_VIEW, uri); 
-			startActivity(intent); 
+			intent = new Intent(Intent.ACTION_VIEW, uri);
+			startActivity(intent);
 			return true;
 		case R.id.menu_manual_user:
 			uri = Uri.parse("http://www.sagemath.org/doc/tutorial/");
-			intent = new Intent(Intent.ACTION_VIEW, uri); 
-			startActivity(intent); 
+			intent = new Intent(Intent.ACTION_VIEW, uri);
+			startActivity(intent);
 			return true;
 		case R.id.menu_manual_dev:
 			uri = Uri.parse("http://www.sagemath.org/doc/reference/");
-			intent = new Intent(Intent.ACTION_VIEW, uri); 
-			startActivity(intent); 
+			intent = new Intent(Intent.ACTION_VIEW, uri);
+			startActivity(intent);
 			return true;
 		case R.id.menu_clean_history:
 			CellCollection.getInstance().cleanHistory();

@@ -14,9 +14,10 @@ import android.widget.TextView;
 
 /**
  * @author Rasmi.Elasmar
- *
+ * @author Ralf.Stephan
+ * 
  */
-public class CellListAdapter extends ArrayAdapter<CellData>  {
+public class CellListAdapter extends ArrayAdapter<CellData> {
 	private final Context context;
 
 	private LinkedList<CellData> cells;
@@ -46,7 +47,8 @@ public class CellListAdapter extends ArrayAdapter<CellData>  {
 
 			item = inflater.inflate(R.layout.cell_list_item, parent, false);
 			titleView = (TextView) item.findViewById(R.id.cell_title);
-			descriptionView = (TextView) item.findViewById(R.id.cell_description);
+			descriptionView = (TextView) item
+					.findViewById(R.id.cell_description);
 			favorite = (CheckBox) item.findViewById(R.id.favorite);
 			favorite.setOnClickListener(new CompoundButton.OnClickListener() {
 				@Override
@@ -56,7 +58,7 @@ public class CellListAdapter extends ArrayAdapter<CellData>  {
 					cells = CellCollection.getInstance().getGroup(cell.group);
 					notifyDataSetChanged();
 				}
-			} );
+			});
 			final ViewHolder viewHolder = new ViewHolder();
 			viewHolder.titleView = titleView;
 			viewHolder.descriptionView = descriptionView;
@@ -64,7 +66,7 @@ public class CellListAdapter extends ArrayAdapter<CellData>  {
 			item.setTag(viewHolder);
 		} else {
 			item = convertView;
-			ViewHolder viewHolder = (ViewHolder)convertView.getTag();
+			ViewHolder viewHolder = (ViewHolder) convertView.getTag();
 			titleView = viewHolder.titleView;
 			descriptionView = viewHolder.descriptionView;
 			favorite = viewHolder.favorite;
@@ -79,4 +81,3 @@ public class CellListAdapter extends ArrayAdapter<CellData>  {
 	}
 
 }
-
