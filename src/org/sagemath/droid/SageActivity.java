@@ -146,57 +146,15 @@ public class SageActivity extends ActionBarActivity implements
 			return true;
 		}
 		case R.id.menu_discard: {
-			FragmentManager fm = this.getSupportFragmentManager();
-			DialogFragment dialog = new DialogFragment() {
-				@Override
-				public Dialog onCreateDialog(Bundle savedInstanceState) {
-					AlertDialog.Builder builder = new AlertDialog.Builder(
-							getActivity());
-					builder.setMessage(R.string.dialog_confirm_discard)
-							.setPositiveButton(R.string.discard,
-									new DialogInterface.OnClickListener() {
-										public void onClick(
-												DialogInterface dialog, int id) {
-											CellCollection.getInstance()
-													.removeCurrentCell();
-											SageActivity.this.onBackPressed();
-										}
-									})
-							.setNegativeButton(R.string.cancel,
-									new DialogInterface.OnClickListener() {
-										public void onClick(
-												DialogInterface dialog, int id) {
-											// User cancelled the dialog
-										}
-									});
-					// Create the AlertDialog object and return it
-					return builder.create();
-				}
-			};
-			dialog.show(fm, DIALOG_DISCARD_CELL);
+			discardButton();
 			return true;
 		}
 		case R.id.menu_search:
 			Toast.makeText(this, "Tapped search", Toast.LENGTH_SHORT).show();
 			return true;
 		case R.id.menu_share:
-			try {
-				String shareURL = server.getShareURI().toString();
-				Intent share = new Intent(android.content.Intent.ACTION_SEND);
-				share.setType("text/plain");
-				share.putExtra(Intent.EXTRA_TEXT, shareURL);
-				startActivity(share);
-			} catch (Exception e) {
-				Log.e(TAG,
-						"Couldn't share for some reason... "
-								+ e.getLocalizedMessage());
-				runButton();
-				Toast.makeText(
-						this,
-						"You must run the calculation first! Try sharing again.",
-						Toast.LENGTH_SHORT).show();
-			}
-			return true;
+			shareButton();
+>			return true;
 		case R.id.menu_changelog:
 			changeLog.getFullLogDialog().show();
 			return true;
@@ -244,41 +202,6 @@ public class SageActivity extends ActionBarActivity implements
 		}
 	}
 
-	private void runButton() {
-		InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-		imm.hideSoftInputFromWindow(input.getWindowToken(), 0);
-		server.interrupt();
-		try {
-			if (!cell.getGroup().equals("History")) {
-				outputView.clear();
-				Log.i(TAG, "Called outputView.clear()!");
-			}
-		} catch (Exception e) {
-			Log.e(TAG, "Error clearing output...");
-		}
-
-		String currentInput = input.getText().toString();
-		server.query(currentInput);
-		getActionBarHelper().setRefreshActionItemState(true);
-		outputView.requestFocus();
-		cell.setInput(currentInput);
-		CellCollection.getInstance().saveCells();
-		saveCurrentToHistory();
-	}
-
-	private void saveCurrentToHistory() {
-		if (!cell.getGroup().equals("History")) {
-			CellData HistoryCell = new CellData(cell);
-			HistoryCell.group = "History";
-			HistoryCell.input = input.getText().toString();
-			String shortenedInput = HistoryCell.input;
-			if (HistoryCell.input.length() > 16)
-				shortenedInput = shortenedInput.substring(0, 16);
-			HistoryCell.title = shortenedInput;
-			CellCollection.getInstance().addCell(HistoryCell);
-		}
-	}
-
 	@Override
 	public void onSageFinishedListener() {
 		getActionBarHelper().setRefreshActionItemState(false);
@@ -311,16 +234,15 @@ public class SageActivity extends ActionBarActivity implements
 		outputView.onResume();
 	}
 
-	protected static final int INSERT_PROMPT = 0;
-	protected static final int INSERT_FOR_LOOP = 1;
-	protected static final int INSERT_LIST_COMPREHENSION = 2;
-
 	@Override
 	public void onItemSelected(AdapterView<?> parent, View view, int position,
 			long arg3) {
+
 		if (parent != insertSpinner)
 			return;
 		int cursor = input.getSelectionStart();
+		
+		final int INSERT_FOR_LOOP=1, INSERT_LIST_COMPREHENSION=2;
 		switch (position) {
 		case INSERT_FOR_LOOP:
 			input.getText().append("\nfor i in range(0,10):\n     ");
@@ -338,6 +260,93 @@ public class SageActivity extends ActionBarActivity implements
 	public void onNothingSelected(AdapterView<?> arg0) {
 		// TODO Auto-generated method stub
 
+	}
+
+	/*--------------------------------------*/
+	
+	private void runButton() {
+		InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+		imm.hideSoftInputFromWindow(input.getWindowToken(), 0);
+		server.interrupt();
+		try {
+			if (!cell.getGroup().equals("History")) {
+				outputView.clear();
+				Log.i(TAG, "Called outputView.clear()!");
+			}
+		} catch (Exception e) {
+			Log.e(TAG, "Error clearing output...");
+		}
+
+		String currentInput = input.getText().toString();
+		server.query(currentInput);
+		getActionBarHelper().setRefreshActionItemState(true);
+		outputView.requestFocus();
+		cell.setInput(currentInput);
+		CellCollection.getInstance().saveCells();
+		saveCurrentToHistory();
+	}
+	
+	private void discardButton() {
+		FragmentManager fm = this.getSupportFragmentManager();
+		DialogFragment dialog = new DialogFragment() {
+			@Override
+			public Dialog onCreateDialog(Bundle savedInstanceState) {
+				AlertDialog.Builder builder = new AlertDialog.Builder(
+						getActivity());
+				builder.setMessage(R.string.dialog_confirm_discard)
+						.setPositiveButton(R.string.discard,
+								new DialogInterface.OnClickListener() {
+									public void onClick(
+											DialogInterface dialog, int id) {
+										CellCollection.getInstance()
+												.removeCurrentCell();
+										SageActivity.this.onBackPressed();
+									}
+								})
+						.setNegativeButton(R.string.cancel,
+								new DialogInterface.OnClickListener() {
+									public void onClick(
+											DialogInterface dialog, int id) {
+										// User cancelled the dialog
+									}
+								});
+				// Create the AlertDialog object and return it
+				return builder.create();
+			}
+		};
+		dialog.show(fm, DIALOG_DISCARD_CELL);
+	}
+	
+	private void shareButton() {
+		try {
+			String shareURL = server.getShareURI().toString();
+			Intent share = new Intent(android.content.Intent.ACTION_SEND);
+			share.setType("text/plain");
+			share.putExtra(Intent.EXTRA_TEXT, shareURL);
+			startActivity(share);
+		} catch (Exception e) {
+			Log.e(TAG,
+					"Couldn't share for some reason... "
+							+ e.getLocalizedMessage());
+			runButton();
+			Toast.makeText(
+					this,
+					"You must run the calculation first! Try sharing again.",
+					Toast.LENGTH_SHORT).show();
+		}
+	}
+	
+	private void saveCurrentToHistory() {
+		if (!cell.getGroup().equals("History")) {
+			CellData HistoryCell = new CellData(cell);
+			HistoryCell.group = "History";
+			HistoryCell.input = input.getText().toString();
+			String shortenedInput = HistoryCell.input;
+			if (HistoryCell.input.length() > 16)
+				shortenedInput = shortenedInput.substring(0, 16);
+			HistoryCell.title = shortenedInput;
+			CellCollection.getInstance().addCell(HistoryCell);
+		}
 	}
 
 }

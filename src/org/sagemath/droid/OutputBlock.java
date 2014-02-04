@@ -100,7 +100,7 @@ public class OutputBlock extends WebView {
 		String uri = dataFile.getURI().toString();
 		String div;
 		String mime = dataFile.getMime();
-		if (dataFile.mime().equals("image/png") || dataFile.mime().equals("image/jpg"))
+		if (mime.equals("image/png") || mime.equals("image/jpg"))
 			div = "<img src=\"" + uri + "\" alt=\"plot output\"></img>";
 		else if (dataFile.mime().equals("image/svg"))
 			div = "<object data\"" + uri + "\" type=\"image/svg+xml\"></object>";

@@ -149,7 +149,6 @@ public class CellCollection {
 	}
 
 	public void removeCurrentCell() {
-		String group = currentCell.group;
 		data.remove(currentCell);
 		saveCells();
 		notifyGroupsChanged();
