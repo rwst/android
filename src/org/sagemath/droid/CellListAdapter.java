@@ -72,10 +72,16 @@ public class CellListAdapter extends ArrayAdapter<CellData> {
 			favorite = viewHolder.favorite;
 		}
 
-		CellData cell = cells.get(my_position);
-		titleView.setText(cell.title);
-		descriptionView.setText(cell.description);
-		favorite.setChecked(cell.isFavorite());
+		try {
+			CellData cell = cells.get(my_position);
+			titleView.setText(cell.title);
+			descriptionView.setText(cell.description);
+			favorite.setChecked(cell.isFavorite());
+		} catch (IndexOutOfBoundsException e) {
+			// TODO Auto-generated catch block
+			titleView.setText("Uninitialized");
+			descriptionView.setText("");
+		}
 
 		return item;
 	}
